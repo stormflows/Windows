@@ -1,0 +1,71 @@
+AGAR WORK KARE TO      ==> LIKE ==> COMMENT ==> SUSBCRIBE
+
+WARNA EK MANPASAND GALI DEDENA COMMENT MAIN (;)
+
+
+STEP:1 Sign into ngrok https://ngrok.com/
+STEP:2 Sign into Github https://github.com/
+
+STEP:3 Create a New Repository
+STEP:4 Go To Setting => Secrets and Variabls => Actions => New Respository Secret => Name:NGROK_AUTH_TOKEN     Now Save
+STEP:5 Go To Actions => Set Up Work Flow Yourself => Copy Code & Paste Their & Click => Start Commit => Commit NEw File 
+STEP:6 Go To Actions => Create Main.yml => Build => Tick All The Steps
+
+STEP:7 Go To Search Bar & Search "Remote Desktop Connection" 
+STEP:8 Copy IP Address Go To ngrok => Cloud Edge => Endpoints => Copy URL
+STEP:9 Click More Choices => Use a Diffrent Account 
+
+STEP:10 Username:runneradmin
+STEP:10 Password:P@ssw0rd!
+
+
+
+
+
+
+
+name: CI
+
+
+on: [push, workflow_dispatch]
+
+
+jobs:
+
+  build:
+
+
+    runs-on: windows-latest
+
+
+    steps:
+
+    - name: Download
+
+      run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+
+    - name: Extract
+
+      run: Expand-Archive ngrok.zip
+
+    - name: Auth
+
+      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+
+      env:
+
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+
+    - name: Enable TS
+
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+
+    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+
+    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+
+    - name: Create Tunnel
+
+      run: .\ngrok\ngrok.exe tcp 3389
